@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test di livello di italiano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout: a single "quaderno" sheet in the centre, ruled lines + red margin; one question per screen. */
+:root{
+  --paper:#f6f7fb;
+  --sheet:#ffffff;
+  --ink:#1b2a6b;
+  --ink-soft:#4a5690;
+  --text:#1d2233;
+  --muted:#626a83;
+  --rule:#dfe5f3;
+  --margin:#d9473f;
+  --ok:#1f7a4d;
+  --ok-bg:#e3f4ea;
+  --ko:#b3261e;
+  --ko-bg:#fbe7e5;
+  --skip:#9aa1b5;
+  --font-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#10131d; --sheet:#171b28; --ink:#9fb2ff; --ink-soft:#8a95c4; --text:#e6e8f0; --muted:#9aa1b8;
+    --rule:#252b3d; --margin:#ef6a60; --ok:#5fd19a; --ok-bg:#183326; --ko:#ff8a80; --ko-bg:#3a1d1c; --skip:#5d6479;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10131d; --sheet:#171b28; --ink:#9fb2ff; --ink-soft:#8a95c4; --text:#e6e8f0; --muted:#9aa1b8;
+  --rule:#252b3d; --margin:#ef6a60; --ok:#5fd19a; --ok-bg:#183326; --ko:#ff8a80; --ko-bg:#3a1d1c; --skip:#5d6479;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--text);font-family:var(--font-body);font-size:17px;line-height:1.55;min-height:100%;}
+.wrap{max-width:760px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:16px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--font-display);font-weight:700;font-size:1.05rem;color:var(--ink);letter-spacing:.01em}
+.brand small{display:block;font-family:var(--font-body);font-weight:400;font-size:.8rem;color:var(--muted)}
+.meta{display:flex;gap:10px;align-items:center;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.pill{border:1px solid var(--rule);background:var(--sheet);border-radius:999px;padding:4px 10px}
+.sheet{
+  background:var(--sheet);border-radius:14px;border:1px solid var(--rule);
+  padding:28px 28px 28px 52px;position:relative;
+  background-image:repeating-linear-gradient(to bottom, transparent 0 31px, var(--rule) 31px 32px);
+  background-position:0 20px;
+}
+.sheet::before{content:"";position:absolute;left:34px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.55}
+@media (max-width:520px){ .sheet{padding:22px 18px 22px 34px} .sheet::before{left:20px} }
+h1,h2,h3{font-family:var(--font-display);color:var(--ink);text-wrap:balance;margin:0}
+h1{font-size:2rem;line-height:1.15}
+h2{font-size:1.45rem;line-height:1.2}
+h3{font-size:1.05rem}
+p{margin:0}
+.en{color:var(--muted);font-size:.88rem;font-style:italic}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:22px}
+.levels-strip{display:flex;gap:6px;flex-wrap:wrap}
+.lvl-chip{font-family:var(--font-display);font-weight:700;font-size:.85rem;padding:3px 10px;border-radius:6px;border:1.5px solid var(--rule);color:var(--muted);background:var(--sheet)}
+.lvl-chip.done{border-color:var(--ink);color:var(--ink)}
+.lvl-chip.now{background:var(--ink);border-color:var(--ink);color:var(--sheet)}
+label.f{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.95rem}
+label.f .en{font-weight:400}
+input[type=text], select, textarea{
+  font:inherit;color:var(--text);background:var(--sheet);border:1.5px solid var(--rule);border-radius:8px;padding:10px 12px;width:100%;
+}
+textarea{min-height:170px;resize:vertical;line-height:1.6}
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){ .grid2{grid-template-columns:1fr} }
+.btn{font:inherit;font-weight:700;cursor:pointer;border-radius:10px;padding:11px 20px;border:1.5px solid var(--ink);background:var(--ink);color:var(--sheet)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.quiet{background:transparent;border-color:transparent;color:var(--muted);font-weight:400;text-decoration:underline;padding:11px 8px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row.end{justify-content:flex-end}
+.row.between{justify-content:space-between}
+.how{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:.95rem}
+.how b{font-family:var(--font-display);color:var(--margin)}
+.reading{border-left:3px solid var(--ink-soft);padding:10px 14px;background:color-mix(in srgb, var(--ink) 6%, var(--sheet));border-radius:0 8px 8px 0;font-size:1rem}
+.qnum{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;gap:8px;align-items:center}
+.tag{font-size:.75rem;border:1px solid var(--rule);border-radius:999px;padding:1px 8px}
+.prompt{font-size:1.3rem;line-height:1.45;font-weight:700}
+.blank{display:inline-block;min-width:3.2em;border-bottom:2px solid var(--margin);margin:0 .15em;transform:translateY(-.15em)}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;font:inherit;color:var(--text);background:var(--sheet);border:1.5px solid var(--rule);border-radius:10px;padding:11px 14px;cursor:pointer}
+.opt:hover{border-color:var(--ink-soft)}
+.opt .k{font-family:var(--font-display);font-weight:700;color:var(--ink-soft);width:1.6em;height:1.6em;border-radius:6px;border:1.5px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;flex:none}
+.opt[aria-pressed="true"]{border-color:var(--ink);background:color-mix(in srgb, var(--ink) 9%, var(--sheet))}
+.opt[aria-pressed="true"] .k{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
+.opt.idk{border-style:dashed;color:var(--muted)}
+.accents{display:flex;gap:6px;flex-wrap:wrap}
+.accents button{font:inherit;font-size:.95rem;min-width:2.2em;padding:4px 8px;border-radius:6px;border:1px solid var(--rule);background:var(--sheet);color:var(--text);cursor:pointer}
+.hint{font-size:.88rem;color:var(--muted)}
+.bar{height:6px;border-radius:999px;background:var(--rule);overflow:hidden}
+.bar > i{display:block;height:100%;background:var(--ink);transition:width .3s}
+@media (prefers-reduced-motion:reduce){ .bar > i{transition:none} }
+/* results */
+.result-hero{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.big-level{font-family:var(--font-display);font-weight:700;font-size:4rem;line-height:1;color:var(--ink);min-width:2.4em}
+.cefr-row{display:grid;grid-template-columns:3.2em 1fr auto;gap:10px;align-items:center;font-variant-numeric:tabular-nums}
+.cefr-row .lv{font-family:var(--font-display);font-weight:700;color:var(--ink)}
+.dots{display:flex;gap:4px;flex-wrap:wrap}
+.dot{width:16px;height:16px;border-radius:4px;background:transparent;border:1.5px dashed var(--skip)}
+.dot.ok{background:var(--ok);border:none}
+.dot.ko{background:var(--ko);border:none}
+.status{font-size:.8rem;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.status.pass{background:var(--ok-bg);color:var(--ok)}
+.status.fail{background:var(--ko-bg);color:var(--ko)}
+.status.none{color:var(--muted)}
+.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:560px){ .skills{grid-template-columns:1fr} }
+.skill{border:1px solid var(--rule);border-radius:10px;padding:12px;background:var(--sheet);display:flex;flex-direction:column;gap:6px}
+.skill .n{font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.topics{display:flex;gap:6px;flex-wrap:wrap}
+.topics span{font-size:.88rem;background:var(--ko-bg);color:var(--ko);border-radius:6px;padding:3px 9px}
+.report{font-family:ui-monospace, "SF Mono", Menlo, monospace;font-size:.8rem;white-space:pre-wrap;background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:12px;max-height:260px;overflow:auto}
+.toast{font-size:.9rem;color:var(--ok)}
+hr.sep{border:none;border-top:1px solid var(--rule);margin:4px 0}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Test di livello · Italiano<small>Placement test · Italian A1–C1</small></div>
+    <div class="meta" id="meta"></div>
+  </header>
+  <main class="sheet" id="app"></main>
+  <div class="row between hint">
+    <span>Livelli secondo il Quadro Comune Europeo di Riferimento (QCER / CEFR).</span>
+    <button class="btn quiet" id="teacherLink" type="button" style="padding:4px 0;font-size:.8rem">Area docente</button>
+  </div>
+</div>
+
+<script>
+const LEVELS = ["A1","A2","B1","B2","C1"];
+const MAX_WRONG = 3;            // B-levels & A2/C1: stop at the 3rd mistake
+const A1_PASS = 12, A1_PARTIAL = 7; // A1 is always asked in full (16 items): pass ≥12, "A1 in corso" 7–11
+const LEN = l => BANK[LEVELS[l]].length;
+const isPassed = (p,i) => p.answered.length===LEN(i) && (i===0 ? p.ok>=A1_PASS : p.ko<MAX_WRONG);
+
+// type: mc (options, a = index) | fill (accept = list). skill: grammatica | lessico | lettura
+const BANK = {
+A1: [
+ {type:"mc", skill:"grammatica", topic:"Verbo essere", q:"Io ___ Marco.", o:["sono","ho","è","sei"], a:0},
+ {type:"mc", skill:"lessico", topic:"Presentarsi", q:"— Come ti chiami?\n— ___", o:["Ho trent'anni.","Mi chiamo Paul.","Sto bene, grazie.","Sono di Londra."], a:1},
+ {type:"mc", skill:"lessico", topic:"Saluti e formule di cortesia", q:"Sono le nove di sera. Entri in un ristorante e dici: «___!»", o:["Buongiorno","Buonasera","Buonanotte","Arrivederci"], a:1},
+ {type:"mc", skill:"grammatica", topic:"Verbo avere", q:"Loro ___ due fratelli.", o:["sono","hanno","avete","ha"], a:1},
+ {type:"mc", skill:"grammatica", topic:"Articoli indeterminativi", q:"Vorrei ___ caffè, per favore.", o:["uno","una","un","un'"], a:2},
+ {type:"fill", skill:"grammatica", topic:"Plurale dei nomi", q:"Un libro, due ___.", hint:"plurale di «libro» · plural of «libro»", accept:["libri"]},
+ {type:"mc", skill:"grammatica", topic:"Articoli determinativi", q:"___ amica di Sara si chiama Anna.", o:["Il","Lo","La","L'"], a:3},
+ {type:"mc", skill:"lessico", topic:"Numeri, giorni e orari", q:"— Che ore sono?\n— ___", o:["È lunedì.","Sono le tre e mezza.","Ho tre anni.","È il tre marzo."], a:1},
+ {type:"fill", skill:"grammatica", topic:"Presente dei verbi in -are", q:"Noi ___ a Roma.", hint:"verbo «abitare», presente · verb «abitare», present tense", accept:["abitiamo"]},
+ {type:"mc", skill:"grammatica", topic:"Presente dei verbi in -ere / -ire", q:"Marco ___ il giornale ogni mattina.", o:["leggo","leggi","legge","leggono"], a:2},
+ {type:"mc", skill:"grammatica", topic:"Accordo degli aggettivi", q:"Le mie sorelle sono molto ___.", o:["simpatico","simpatica","simpatici","simpatiche"], a:3},
+ {type:"mc", skill:"grammatica", topic:"Preposizioni di luogo (a/in)", q:"Domani vado ___ Milano.", o:["in","a","di","da"], a:1},
+ {type:"mc", skill:"lessico", topic:"Parole interrogative", q:"— ___ costa questa borsa?\n— Trenta euro.", o:["Come","Quando","Quanto","Dove"], a:2},
+ {type:"mc", skill:"grammatica", topic:"Negazione e c'è / ci sono", q:"Nel frigorifero ___ latte: devo comprarlo.", o:["non c'è","non ci sono","c'è non","non è"], a:0},
+ {type:"mc", skill:"lettura", topic:"Comprensione di un testo semplice", text:"Ciao! Mi chiamo Lucia, ho 25 anni e sono di Napoli. Lavoro in un bar vicino alla stazione. La sera studio inglese con un'amica.", q:"Dove lavora Lucia?", o:["In un ufficio","In una scuola","In un bar","Alla stazione"], a:2},
+ {type:"mc", skill:"lettura", topic:"Comprensione di un testo semplice", text:"Ciao! Mi chiamo Lucia, ho 25 anni e sono di Napoli. Lavoro in un bar vicino alla stazione. La sera studio inglese con un'amica.", q:"Che cosa fa Lucia la sera?", o:["Lavora al bar","Studia inglese","Va in stazione","Insegna inglese"], a:1},
+],
+A2: [
+ {type:"mc", skill:"grammatica", topic:"Passato prossimo: ausiliare e accordo", q:"Ieri Maria ___ al cinema.", o:["ha andato","è andata","è andato","ha andata"], a:1},
+ {type:"fill", skill:"grammatica", topic:"Passato prossimo con avere", q:"Ieri sera noi ___ una pizza.", hint:"verbo «mangiare», passato prossimo · past tense", accept:["abbiamo mangiato"]},
+ {type:"mc", skill:"grammatica", topic:"Preposizioni articolate", q:"Le chiavi sono ___ tavolo.", o:["su il","dal","sul","nel"], a:2},
+ {type:"mc", skill:"grammatica", topic:"Pronomi diretti", q:"— Conosci Marco?\n— Sì, ___ conosco bene.", o:["la","gli","li","lo"], a:3},
+ {type:"mc", skill:"grammatica", topic:"Verbi riflessivi", q:"La mattina io ___ alle sette.", o:["mi sveglio","sveglio","si sveglio","mi svegli"], a:0},
+ {type:"mc", skill:"grammatica", topic:"Imperfetto (abitudini passate)", q:"Da bambino ___ ogni pomeriggio al parco.", o:["ho giocato","giocavo","gioco","giocherò"], a:1},
+ {type:"mc", skill:"lessico", topic:"Negozi e vita quotidiana", q:"Per comprare il pane vado in ___.", o:["farmacia","edicola","macelleria","panetteria"], a:3},
+ {type:"mc", skill:"lettura", topic:"Comprensione di un racconto al passato", text:"Cara Giulia, la settimana scorsa sono andata a Firenze con mia sorella. Siamo partite venerdì mattina in treno e siamo tornate domenica sera. Sabato ha piovuto tutto il giorno, così siamo rimaste agli Uffizi invece di fare una passeggiata in collina. Peccato, ma il museo era bellissimo!", q:"Perché non hanno fatto la passeggiata in collina?", o:["Perché erano stanche","Perché pioveva","Perché il museo era chiuso","Perché sono tornate venerdì"], a:1},
+],
+B1: [
+ {type:"mc", skill:"grammatica", topic:"Condizionale presente (consigli)", q:"Al tuo posto, io ___ con il capo.", o:["parlo","parlerò","parlerei","ho parlato"], a:2},
+ {type:"mc", skill:"grammatica", topic:"Pronomi combinati", q:"— Hai dato il regalo a Luca?\n— ___", o:["Sì, gli l'ho dato ieri.","Sì, gliel'ho dato ieri.","Sì, lo gli ho dato ieri.","Sì, gli ho dato ieri."], a:1},
+ {type:"mc", skill:"grammatica", topic:"Passato prossimo vs imperfetto", q:"Mentre ___ la TV, è suonato il telefono.", o:["ho guardato","guardo","guardavo","guarderò"], a:2},
+ {type:"fill", skill:"grammatica", topic:"Particella «ne»", q:"— Quante mele vuoi?\n— ___ voglio tre.", hint:"una parola · one word", accept:["ne"]},
+ {type:"mc", skill:"grammatica", topic:"Congiuntivo presente (opinioni)", q:"Penso che Marco ___ ragione.", o:["avrà","abbia","avesse","avrebbe"], a:1},
+ {type:"mc", skill:"grammatica", topic:"Trapassato prossimo", q:"Quando sono arrivato alla stazione, il treno ___ già partito.", o:["era","è","aveva","ha"], a:0},
+ {type:"mc", skill:"lessico", topic:"Connettivi (concessivi/causali)", q:"Ho studiato moltissimo, ___ l'esame è andato male.", o:["perché","quindi","siccome","eppure"], a:3},
+ {type:"mc", skill:"lettura", topic:"Comprensione di un testo informativo", text:"Negli ultimi anni molte aziende italiane hanno introdotto il lavoro da remoto. Secondo molti dipendenti, lavorare da casa permette di risparmiare tempo e denaro; c'è però anche chi lamenta la mancanza di contatto con i colleghi e la difficoltà di separare la vita privata dal lavoro.", q:"Secondo il testo, qual è uno svantaggio del lavoro da remoto?", o:["Si spende di più per i trasporti","È difficile separare lavoro e vita privata","Le aziende pagano stipendi più bassi","Si lavorano meno ore"], a:1},
+],
+B2: [
+ {type:"mc", skill:"grammatica", topic:"Periodo ipotetico (2° tipo)", q:"Se ___ più tempo, imparerei il giapponese.", o:["avrei","ho","avessi","avevo"], a:2},
+ {type:"mc", skill:"grammatica", topic:"Concordanza: congiuntivo imperfetto", q:"Credevo che tu ___ già partito.", o:["sei","sia","saresti","fossi"], a:3},
+ {type:"mc", skill:"grammatica", topic:"Si impersonale / passivante", q:"In Italia ___ molta pasta.", o:["si mangia","si mangiano","mangia si","si mangi"], a:0},
+ {type:"fill", skill:"grammatica", topic:"Congiuntivo dopo «benché»", q:"Benché ___ stanca, Anna è uscita con gli amici.", hint:"verbo «essere» · verb «essere»", accept:["fosse"]},
+ {type:"mc", skill:"grammatica", topic:"Condizionale passato (futuro nel passato)", q:"Mi avevi detto che ___ ieri, ma non sei venuto.", o:["verresti","saresti venuto","verrai","fossi venuto"], a:1},
+ {type:"mc", skill:"lessico", topic:"Espressioni idiomatiche", q:"Era così sorpreso che è rimasto a bocca ___.", o:["chiusa","piena","aperta","larga"], a:2},
+ {type:"mc", skill:"lessico", topic:"Lessico astratto e collocazioni", q:"Il governo ha ___ nuove misure contro l'inquinamento.", o:["adattato","adottato","adeguato","addotto"], a:1},
+ {type:"mc", skill:"lettura", topic:"Comprensione di un testo argomentativo", text:"Il fenomeno dell'overtourism ha spinto alcune città, come Venezia, a introdurre un contributo d'accesso per i visitatori giornalieri. I sostenitori della misura ritengono che possa aiutare a regolare i flussi e a finanziare la manutenzione della città; i critici, invece, temono che trasformi il centro storico in una sorta di museo a pagamento, senza affrontare le cause profonde dello spopolamento.", q:"Che cosa temono i critici della misura?", o:["Che il numero dei turisti aumenti","Che la manutenzione diventi troppo costosa","Che Venezia diventi un museo a pagamento senza risolvere lo spopolamento","Che i residenti debbano pagare il contributo"], a:2},
+],
+C1: [
+ {type:"mc", skill:"grammatica", topic:"Periodo ipotetico (3° tipo)", q:"Se mi ___ prima, ti avrei aiutato.", o:["avresti avvisato","avevi avvisato","avvisassi","avessi avvisato"], a:3},
+ {type:"mc", skill:"grammatica", topic:"Congiuntivo nelle relative", q:"Cerchiamo un collaboratore che ___ parlare tre lingue.", o:["sappia","saprà","sapesse","saprebbe"], a:0},
+ {type:"mc", skill:"grammatica", topic:"Passato remoto", q:"Dante ___ la Divina Commedia all'inizio del Trecento.", o:["scrivé","scrisse","scrivette","scrivesse"], a:1},
+ {type:"mc", skill:"lessico", topic:"Registro formale", q:"In una e-mail formale, quale chiusura è più appropriata?", o:["Fammi sapere, ciao!","Aspetto che mi rispondi.","Resto in attesa di un Suo cortese riscontro.","Rispondimi presto, grazie."], a:2},
+ {type:"fill", skill:"grammatica", topic:"Gerundio concessivo («pur» + gerundio)", q:"Pur ___ la verità, non ha detto nulla.", hint:"verbo «sapere» · verb «sapere»", accept:["sapendo"]},
+ {type:"mc", skill:"lessico", topic:"Connettivi testuali avanzati", q:"___ i dati siano incoraggianti, è prematuro parlare di ripresa.", o:["Siccome","Poiché","Sebbene","Dunque"], a:2},
+ {type:"mc", skill:"lessico", topic:"Lessico giornalistico", q:"Il ministro ha ___ le accuse, definendole infondate.", o:["respinto","declinato","sconfessato","ritirato"], a:0},
+ {type:"mc", skill:"lettura", topic:"Inferenza, tono e ironia", text:"Non che il nuovo piano urbanistico manchi di ambizione: al contrario, ne ha fin troppa. Il guaio è che, tra rendering patinati e slogan sulla sostenibilità, si fatica a trovare una sola riga dedicata a chi in quei quartieri ci vive già.", q:"Qual è la posizione dell'autore?", o:["Lo considera poco ambizioso","Lo approva senza riserve","Lo critica perché trascura chi abita già nei quartieri","Critica la sostenibilità come obiettivo urbanistico"], a:2},
+]};
+
+const DESCR = {
+ "Pre-A1":["Principiante assoluto: conosce poche parole isolate. Si parte dalle basi.","Absolute beginner: a few isolated words. We start from the basics."],
+ "A1":["Capisce e usa espressioni quotidiane e frasi molto semplici; sa presentarsi e fare domande personali di base.","Can understand and use familiar everyday expressions and very basic phrases; can introduce themselves."],
+ "A2":["Comunica in situazioni semplici e abituali; sa descrivere il proprio passato e l'ambiente circostante.","Can communicate in simple, routine tasks and describe their background and immediate environment."],
+ "B1":["Se la cava nella maggior parte delle situazioni di viaggio; sa raccontare esperienze, esprimere opinioni e progetti.","Can deal with most travel situations, describe experiences and give opinions and plans."],
+ "B2":["Interagisce con scioltezza; comprende testi complessi e sa argomentare un punto di vista.","Can interact fluently and spontaneously, understand complex texts and argue a viewpoint."],
+ "C1":["Si esprime in modo fluido e preciso; comprende testi lunghi e impliciti, usa la lingua con flessibilità.","Can express ideas fluently and precisely, understand implicit meaning and use language flexibly."]
+};
+
+const WRITING = {
+ "Pre-A1":["Presentati in 2–4 frasi: nome, città, lavoro o studio.","Introduce yourself in 2–4 sentences: name, city, job or studies."],
+ "A1":["Presentati: nome, età, città, lavoro o studio, che cosa ti piace fare (4–6 frasi).","Introduce yourself: name, age, city, job/studies, what you like doing (4–6 sentences)."],
+ "A2":["Racconta il tuo ultimo fine settimana: dove sei andato/a, con chi, che cosa hai fatto (circa 60 parole).","Describe your last weekend: where you went, who with, what you did (about 60 words)."],
+ "B1":["Perché vuoi imparare l'italiano? Racconta i tuoi obiettivi e le tue esperienze con la lingua (circa 80 parole).","Why do you want to learn Italian? Describe your goals and experience (about 80 words)."],
+ "B2":["Secondo te, è meglio imparare una lingua con un insegnante o da soli, con le app? Argomenta la tua opinione (circa 100 parole).","Is it better to learn a language with a teacher or alone with apps? Argue your opinion (about 100 words)."],
+ "C1":["Commenta questa affermazione: «Una lingua non si impara, si abita». Sei d'accordo? (circa 120 parole)","Comment on the statement «You don't learn a language, you inhabit it». Do you agree? (about 120 words)"]
+};
+
+const SKILL_NAMES = {grammatica:["Grammatica","Grammar"], lessico:["Lessico","Vocabulary"], lettura:["Lettura","Reading"]};
+
+let S;
+function reset(){
+  S = {view:"intro", info:{}, lvl:0, qi:0, raw:[], log:[], perLevel:LEVELS.map(()=>({ok:0,ko:0,answered:[]})),
+       start:null, end:null, sel:null, writing:"", writingPrompt:null, result:null};
+}
+reset();
+
+const $app = document.getElementById("app");
+const $meta = document.getElementById("meta");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[’`´]/g,"'").toLowerCase().replace(/[.!?,;:]+$/,"").replace(/\s+/g," ").trim();
+const fmtQ = q => esc(q).replace(/___/g,'<span class="blank" aria-label="spazio vuoto"></span>').replace(/\n/g,"<br>");
+const mmss = ms => { const s=Math.max(0,Math.round(ms/1000)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); };
+
+let timer=null;
+function tick(){
+  if(S.view==="quiz"||S.view==="writing"){
+    $meta.innerHTML = `<span class="pill" title="Tempo · Time">⏱ ${mmss(Date.now()-S.start)} / ~15:00</span>`;
+  } else if(S.view==="results"){
+    $meta.innerHTML = `<span class="pill">Area docente · durata ${mmss(S.end-S.start)}</span>`;
+  } else if(S.view==="teacher"||S.view==="pin"){
+    $meta.innerHTML = `<span class="pill">Area docente</span>`;
+  } else if(S.view==="done"){
+    $meta.innerHTML = "";
+  } else $meta.innerHTML = `<span class="pill">~15 min</span>`;
+}
+
+function render(){
+  tick();
+  if(S.view==="intro") return renderIntro();
+  if(S.view==="quiz") return renderQ();
+  if(S.view==="writing") return renderWriting();
+  if(S.view==="done") return renderDone();
+  if(S.view==="teacher") return renderTeacher();
+  if(S.view==="pin") return renderPin();
+  if(S.view==="results") return renderResults();
+}
+
+function renderIntro(){
+  $app.innerHTML = `
+  <div class="stack-lg">
+    <div class="stack">
+      <h1>Qual è il tuo livello di italiano?</h1>
+      <p class="en">What is your level of Italian?</p>
+    </div>
+    <div class="how">
+      <b>1</b><div>Le domande partono dal livello A1 e diventano più difficili man mano che rispondi correttamente.<br><span class="en">Questions start at A1 and get harder as you answer correctly.</span></div>
+      <b>2</b><div>Il test si ferma da solo quando le domande diventano troppo difficili. È normale non arrivare alla fine!<br><span class="en">The test stops by itself when questions get too hard. It's normal not to reach the end!</span></div>
+      <b>3</b><div>Se non sai la risposta, scegli <strong>«Non lo so»</strong>: non tirare a indovinare.<br><span class="en">If you don't know, choose «Non lo so» (I don't know). Please don't guess.</span></div>
+      <b>4</b><div>Alla fine scriverai un breve testo e copierai i risultati per la tua insegnante.<br><span class="en">At the end you'll write a short text and copy your results for your teacher.</span></div>
+    </div>
+    <hr class="sep">
+    <form id="f" class="stack" novalidate>
+      <div class="grid2">
+        <label class="f" for="name">Nome <span class="en">Name</span><input type="text" id="name" autocomplete="given-name" required></label>
+        <label class="f" for="native">Lingua madre <span class="en">Native language</span><input type="text" id="native"></label>
+      </div>
+      <label class="f" for="studied">Hai già studiato italiano? <span class="en">Have you studied Italian before?</span>
+        <select id="studied">
+          <option value="Mai">Mai · Never</option>
+          <option value="Meno di 6 mesi">Meno di 6 mesi · Less than 6 months</option>
+          <option value="6 mesi – 2 anni">6 mesi – 2 anni · 6 months – 2 years</option>
+          <option value="Più di 2 anni">Più di 2 anni · More than 2 years</option>
+          <option value="Ho vissuto in Italia">Ho vissuto in Italia · I've lived in Italy</option>
+        </select>
+      </label>
+      <label class="f" for="goal">Perché studi italiano? <span class="en">Why are you learning Italian? (optional)</span><input type="text" id="goal" placeholder="lavoro, viaggi, famiglia, università…"></label>
+      <p id="err" class="hint hidden" style="color:var(--ko)">Scrivi il tuo nome per iniziare. · Please enter your name to start.</p>
+      <div class="row end"><button class="btn" type="submit">Inizia il test · Start →</button></div>
+    </form>
+  </div>`;
+  document.getElementById("f").addEventListener("submit", e=>{
+    e.preventDefault();
+    const name=document.getElementById("name").value.trim();
+    if(!name){ document.getElementById("err").classList.remove("hidden"); document.getElementById("name").focus(); return; }
+    S.info={name, native:document.getElementById("native").value.trim(), studied:document.getElementById("studied").value, goal:document.getElementById("goal").value.trim()};
+    S.view="quiz"; S.start=Date.now(); timer=setInterval(tick,1000); render();
+  });
+}
+
+function cur(){ return BANK[LEVELS[S.lvl]][S.qi]; }
+
+function renderQ(){
+  const it = cur(), L = LEVELS[S.lvl];
+  const total = LEVELS.reduce((t,_,i)=>t+LEN(i),0), doneCount = S.log.length;
+  S.sel = null;
+  const chips = LEVELS.map((l,i)=>`<span class="lvl-chip ${i<S.lvl?'done':''} ${i===S.lvl?'now':''}">${l}</span>`).join("");
+  let body = "";
+  if(it.type==="mc"){
+    body = `<div class="opts" role="group" aria-label="Risposte">
+      ${it.o.map((o,i)=>`<button class="opt" type="button" data-i="${i}" aria-pressed="false"><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("")}
+      <button class="opt idk" type="button" data-i="-1" aria-pressed="false"><span class="k">?</span><span>Non lo so · I don't know</span></button>
+    </div>`;
+  } else {
+    body = `<div class="stack">
+      <label class="f" for="ans">Scrivi la parola mancante <span class="en">Type the missing word(s)${it.hint?` — ${esc(it.hint)}`:""}</span>
+        <input type="text" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <div class="accents" aria-label="Lettere accentate">${["à","è","é","ì","ò","ù","'"].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join("")}</div>
+      <div><button class="opt idk" type="button" id="idkFill" aria-pressed="false"><span class="k">?</span><span>Non lo so · I don't know</span></button></div>
+    </div>`;
+  }
+  $app.innerHTML = `
+  <div class="stack-lg">
+    <div class="row between">
+      <div class="levels-strip" aria-label="Livelli">${chips}</div>
+      <div class="qnum">Domanda ${S.qi+1} di ${LEN(S.lvl)} · livello ${L} <span class="tag">${SKILL_NAMES[it.skill][0]}</span></div>
+    </div>
+    <div class="bar" aria-hidden="true"><i style="width:${Math.round(doneCount/total*100)}%"></i></div>
+    ${it.text?`<div class="stack"><p class="hint">Leggi il testo · Read the text</p><div class="reading">${esc(it.text)}</div></div>`:""}
+    <div class="stack">
+      <p class="hint">${it.type==="mc"?"Scegli la risposta corretta · Choose the correct answer":"Completa la frase · Complete the sentence"}</p>
+      <p class="prompt">${fmtQ(it.q)}</p>
+    </div>
+    ${body}
+    <div class="row end"><button class="btn" id="next" disabled>Avanti · Next →</button></div>
+  </div>`;
+  const next=document.getElementById("next");
+  if(it.type==="mc"){
+    $app.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
+      $app.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed","false"));
+      b.setAttribute("aria-pressed","true"); S.sel=+b.dataset.i; next.disabled=false;
+    }));
+  } else {
+    const inp=document.getElementById("ans"), idk=document.getElementById("idkFill");
+    inp.focus();
+    inp.addEventListener("input",()=>{ idk.setAttribute("aria-pressed","false"); S.sel = inp.value.trim()||null; next.disabled=!S.sel; });
+    $app.querySelectorAll(".accents button").forEach(b=>b.addEventListener("click",()=>{
+      const s=inp.selectionStart??inp.value.length, e=inp.selectionEnd??inp.value.length;
+      inp.value=inp.value.slice(0,s)+b.dataset.c+inp.value.slice(e); inp.focus(); inp.setSelectionRange(s+1,s+1);
+      inp.dispatchEvent(new Event("input"));
+    }));
+    idk.addEventListener("click",()=>{ inp.value=""; idk.setAttribute("aria-pressed","true"); S.sel=-1; next.disabled=false; });
+  }
+  next.addEventListener("click", submit);
+}
+
+function grade(l, qi, sel){
+  const it=BANK[LEVELS[l]][qi];
+  let ok=false, given;
+  if(it.type==="mc"){ ok = sel===it.a; given = sel===-1 ? "(non lo so)" : it.o[sel]; }
+  else { given = sel===-1 ? "(non lo so)" : sel; ok = sel!==-1 && it.accept.some(a=>norm(a)===norm(sel)); }
+  const right = it.type==="mc" ? it.o[it.a] : it.accept[0];
+  S.log.push({level:LEVELS[l], item:it, given, right, ok});
+  S.raw.push([l, qi, sel]);
+  const pl=S.perLevel[l]; pl.answered.push(ok); ok?pl.ok++:pl.ko++;
+  return pl;
+}
+
+function submit(){
+  if(S.sel===null) return;
+  const pl = grade(S.lvl, S.qi, S.sel);
+  S.qi++;
+  if(S.lvl>0 && pl.ko>=MAX_WRONG){ return finishQuiz(); }
+  if(S.qi>=LEN(S.lvl)){
+    if(!isPassed(pl,S.lvl)) return finishQuiz();
+    if(S.lvl===LEVELS.length-1) return finishQuiz();
+    S.lvl++; S.qi=0;
+  }
+  render();
+}
+
+function computeResult(){
+  const passed = S.perLevel.filter(isPassed).length;
+  const stop = S.perLevel[passed]; // level where test stopped (if any)
+  const partial = stop ? stop.ok : 0;
+  let label, base, note="";
+  if(passed===LEVELS.length){ label="C1"; base="C1"; note="Livello C1 o superiore · C1 or above"; }
+  else if(passed===0){
+    if(partial>=A1_PARTIAL){ label="A1"; base="A1"; note="A1 in corso (basi parziali) · A1 in progress"; }
+    else { label="Pre-A1"; base="Pre-A1"; note="Principiante · Beginner"; }
+  } else {
+    base=LEVELS[passed-1];
+    if(partial>=3){ label=base+"+"; note=`Solido ${base}, già in cammino verso ${LEVELS[passed]} · Solid ${base}, moving towards ${LEVELS[passed]}`; }
+    else { label=base; note=`Livello ${base} · ${base} level`; }
+  }
+  const skills={};
+  for(const k of Object.keys(SKILL_NAMES)) skills[k]={ok:0,n:0};
+  S.log.forEach(r=>{ skills[r.item.skill].n++; if(r.ok) skills[r.item.skill].ok++; });
+  const topics=[...new Set(S.log.filter(r=>!r.ok).map(r=>r.item.topic))];
+  return {label, base, note, passed, skills, topics};
+}
+
+function finishQuiz(){
+  S.result = computeResult();
+  S.writingPrompt = WRITING[S.result.base];
+  S.view="writing"; render();
+}
+
+function renderWriting(){
+  const [it,en]=S.writingPrompt;
+  $app.innerHTML = `
+  <div class="stack-lg">
+    <div class="stack">
+      <h2>Ultima parte: scrivi un breve testo</h2>
+      <p class="en">Last part: write a short text (about 3 minutes). No dictionary, no translator, please!</p>
+    </div>
+    <div class="reading"><strong>${esc(it)}</strong><br><span class="en">${esc(en)}</span></div>
+    <label class="f" for="w">Il tuo testo <span class="en">Your text</span><textarea id="w" spellcheck="false">${esc(S.writing)}</textarea></label>
+    <div class="row between">
+      <span class="hint" id="wc">0 parole</span>
+      <div class="row"><button class="btn quiet" id="skip">Salta · Skip</button><button class="btn" id="done">Vedi i risultati · See results →</button></div>
+    </div>
+  </div>`;
+  const w=document.getElementById("w"), wc=document.getElementById("wc");
+  const upd=()=>{ S.writing=w.value; const n=(w.value.trim().match(/\S+/g)||[]).length; wc.textContent=`${n} ${n===1?"parola":"parole"} · words`; };
+  w.addEventListener("input",upd); upd(); w.focus();
+  document.getElementById("skip").addEventListener("click",()=>{ S.writing=""; toResults(); });
+  document.getElementById("done").addEventListener("click",toResults);
+}
+function toResults(){ S.end=Date.now(); clearInterval(timer); S.view="done"; render(); window.scrollTo(0,0); }
+
+/* ---- Codice risultati: lo studente lo copia, solo l'area docente lo decodifica ---- */
+const KEY = "quaderno-blu-26";
+const CODE_V = "ITA2-";
+function encodeResults(){
+  const p = {v:1, n:S.info.name, nl:S.info.native, st:S.info.studied, g:S.info.goal, t0:S.start, d:S.end-S.start, a:S.raw, w:S.writing};
+  const bytes = new TextEncoder().encode(JSON.stringify(p));
+  for(let i=0;i<bytes.length;i++) bytes[i]^=KEY.charCodeAt(i%KEY.length);
+  let bin=""; bytes.forEach(b=>bin+=String.fromCharCode(b));
+  const b64 = btoa(bin).replace(/=+$/,"");
+  return CODE_V + b64;
+}
+function decodeResults(code){
+  let s = String(code).replace(/\s+/g,"");
+  const m = s.match(/ITA2-([A-Za-z0-9+/]+)/);
+  if(!m) throw new Error("format");
+  s = m[1]; while(s.length%4) s+="=";
+  const bin = atob(s); const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i) ^ KEY.charCodeAt(i%KEY.length);
+  const p = JSON.parse(new TextDecoder().decode(bytes));
+  reset();
+  S.info = {name:p.n||"(senza nome)", native:p.nl||"", studied:p.st||"", goal:p.g||""};
+  S.start = p.t0; S.end = p.t0 + p.d; S.writing = p.w||"";
+  (p.a||[]).forEach(([l,qi,sel])=>{ if(BANK[LEVELS[l]] && BANK[LEVELS[l]][qi]) grade(l,qi,sel); });
+  S.result = computeResult();
+  S.writingPrompt = WRITING[S.result.base];
+}
+
+function renderDone(){
+  const code = encodeResults();
+  $app.innerHTML = `
+  <div class="stack-lg">
+    <div class="stack">
+      <h1>Grazie, ${esc(S.info.name)}! Hai finito.</h1>
+      <p class="en">Thank you! You have finished the test.</p>
+    </div>
+    <p>Copia il codice qui sotto e incollalo nella chat di Preply con la tua insegnante. Ne parleremo insieme nella prima lezione.<br>
+    <span class="en">Copy the code below and paste it in the Preply chat with your teacher. We'll talk about your results in the first lesson.</span></p>
+    <div class="report" id="rep" tabindex="0" style="word-break:break-all">${esc(code)}</div>
+    <div class="row end"><span class="toast hidden" id="toast"></span><button class="btn" id="copy">Copia il codice · Copy code</button></div>
+    <p class="hint">Importante: copia il codice prima di chiudere questa pagina. · Important: copy the code before closing this page.</p>
+  </div>`;
+  document.getElementById("copy").addEventListener("click", ()=>copyText(code));
+}
+
+async function copyText(t){
+  const toast=document.getElementById("toast");
+  try{ await navigator.clipboard.writeText(t); toast.textContent="Copiato! · Copied!"; }
+  catch(e){
+    const rep=document.getElementById("rep"); const r=document.createRange(); r.selectNodeContents(rep);
+    const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    toast.textContent="Testo selezionato: premi Ctrl/Cmd+C · Text selected: press Ctrl/Cmd+C";
+  }
+  toast.classList.remove("hidden");
+}
+
+function renderTeacher(){
+  $app.innerHTML = `
+  <div class="stack-lg">
+    <div class="stack">
+      <h1>Area docente</h1>
+      <p class="hint">Incolla il codice che lo studente ti ha inviato su Preply (inizia con ITA2-).</p>
+    </div>
+    <label class="f" for="code">Codice dello studente<textarea id="code" style="min-height:120px;word-break:break-all" spellcheck="false" placeholder="ITA2-…"></textarea></label>
+    <p id="cerr" class="hint hidden" style="color:var(--ko)">Questo codice non è valido o è incompleto. Controlla di averlo copiato tutto, dall'inizio (ITA2-) alla fine.</p>
+    <div class="row end"><button class="btn" id="show">Mostra i risultati</button></div>
+  </div>`;
+  document.getElementById("show").addEventListener("click", ()=>{
+    try{ decodeResults(document.getElementById("code").value); S.view="results"; render(); window.scrollTo(0,0); }
+    catch(e){ document.getElementById("cerr").classList.remove("hidden"); }
+  });
+}
+
+function reportText(){
+  const R=S.result, d=new Date(S.start);
+  const lines=[];
+  lines.push("TEST DI LIVELLO – ITALIANO");
+  lines.push(`Studente: ${S.info.name}${S.info.native?` | Lingua madre: ${S.info.native}`:""}`);
+  lines.push(`Studio precedente: ${S.info.studied}${S.info.goal?` | Obiettivo: ${S.info.goal}`:""}`);
+  lines.push(`Data: ${d.toLocaleDateString("it-IT")} | Durata: ${mmss(S.end-S.start)}`);
+  lines.push("");
+  lines.push(`LIVELLO STIMATO: ${R.label}  (${R.note.split(" · ")[0]})`);
+  lines.push("");
+  lines.push("Per livello:");
+  LEVELS.forEach((l,i)=>{
+    const p=S.perLevel[i]; if(!p.answered.length){ lines.push(`  ${l}: non raggiunto`); return; }
+    const pass = isPassed(p,i);
+    lines.push(`  ${l}: ${p.ok}/${p.answered.length} corrette ${pass?"✓ superato":"✗ test interrotto qui"}`);
+  });
+  lines.push("");
+  lines.push("Per abilità: " + Object.entries(R.skills).filter(([,v])=>v.n).map(([k,v])=>`${SKILL_NAMES[k][0]} ${v.ok}/${v.n}`).join(" · "));
+  lines.push("");
+  const errs=S.log.filter(r=>!r.ok);
+  lines.push(`Errori (${errs.length}):`);
+  if(!errs.length) lines.push("  nessuno");
+  errs.forEach(r=>lines.push(`  [${r.level}] ${r.item.topic} — «${r.item.q.replace(/\n/g," ")}» → risposta: ${r.given} | corretta: ${r.right}`));
+  lines.push("");
+  lines.push(`Produzione scritta (traccia ${R.base}): ${S.writingPrompt[0]}`);
+  lines.push(S.writing.trim() ? S.writing.trim() : "(saltata)");
+  return lines.join("\n");
+}
+
+function renderResults(){
+  const R=S.result;
+  const [dIt,dEn]=DESCR[R.base];
+  const rows = LEVELS.map((l,i)=>{
+    const p=S.perLevel[i];
+    const dots = Array.from({length:LEN(i)},(_,k)=>{ const v=p.answered[k]; return `<span class="dot ${v===true?'ok':v===false?'ko':''}" title="${v===true?'corretta':v===false?'sbagliata':'non svolta'}"></span>`; }).join("");
+    let st;
+    if(!p.answered.length) st=`<span class="status none">non raggiunto</span>`;
+    else if(isPassed(p,i)) st=`<span class="status pass">superato ${p.ok}/${LEN(i)}</span>`;
+    else st=`<span class="status fail">${p.ok}/${p.answered.length} · stop</span>`;
+    return `<div class="cefr-row"><span class="lv">${l}</span><div class="dots">${dots}</div>${st}</div>`;
+  }).join("");
+  const skills = Object.entries(R.skills).map(([k,v])=>{
+    const pct = v.n?Math.round(v.ok/v.n*100):0;
+    return `<div class="skill"><span>${SKILL_NAMES[k][0]} <span class="en">${SKILL_NAMES[k][1]}</span></span><span class="n">${v.n?`${v.ok}/${v.n}`:"–"}</span><div class="bar"><i style="width:${pct}%"></i></div></div>`;
+  }).join("");
+  $app.innerHTML = `
+  <div class="stack-lg">
+    <div class="result-hero">
+      <div class="big-level">${esc(R.label)}</div>
+      <div class="stack" style="flex:1;min-width:240px">
+        <h2>Livello stimato di ${esc(S.info.name)}</h2>
+        <p class="hint">${[S.info.native?`Lingua madre: ${esc(S.info.native)}`:"", S.info.studied?`Studio precedente: ${esc(S.info.studied)}`:"", S.info.goal?`Obiettivo: ${esc(S.info.goal)}`:""].filter(Boolean).join(" · ")}</p>
+        <p>${esc(R.note.split(" · ")[0])}. ${esc(dIt)}</p>
+        <p class="en">${esc(dEn)}</p>
+      </div>
+    </div>
+    <div class="stack">
+      <h3>Risultati per livello <span class="en">Results by level</span></h3>
+      ${rows}
+    </div>
+    <div class="stack">
+      <h3>Per abilità <span class="en">By skill</span></h3>
+      <div class="skills">${skills}</div>
+    </div>
+    ${R.topics.length?`<div class="stack"><h3>Argomenti da rivedere <span class="en">Topics to review</span></h3><div class="topics">${R.topics.map(t=>`<span>${esc(t)}</span>`).join("")}</div></div>`:""}
+    <hr class="sep">
+    <div class="stack">
+      <h3>Produzione scritta</h3>
+      <p class="hint">Traccia (${esc(R.base)}): ${esc(S.writingPrompt[0])}</p>
+      <div class="reading" style="white-space:pre-wrap">${S.writing.trim()?esc(S.writing.trim()):"<em>Saltata dallo studente.</em>"}</div>
+    </div>
+    <hr class="sep">
+    <div class="stack">
+      <h3>Riepilogo completo con tutti gli errori</h3>
+      <p class="hint">Da copiare nei tuoi appunti sullo studente.</p>
+      <div class="report" id="rep" tabindex="0">${esc(reportText())}</div>
+      <div class="row between">
+        <button class="btn quiet" id="again">Leggi un altro codice</button>
+        <div class="row"><span class="toast hidden" id="toast"></span><button class="btn" id="copy">Copia il riepilogo</button></div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById("copy").addEventListener("click", ()=>copyText(reportText()));
+  document.getElementById("again").addEventListener("click",()=>{ reset(); S.view="teacher"; render(); window.scrollTo(0,0); });
+}
+
+document.addEventListener("keydown", e=>{
+  if(S.view!=="quiz") return;
+  const it=cur();
+  if(it.type==="mc" && /^[1-4]$/.test(e.key) && document.activeElement.tagName!=="INPUT"){
+    const b=$app.querySelector(`.opt[data-i="${+e.key-1}"]`); if(b) b.click();
+  }
+  if(e.key==="Enter"){ const n=document.getElementById("next"); if(n && !n.disabled){ e.preventDefault(); n.click(); } }
+});
+
+const TEACHER_PIN = "quaderno26";
+function renderPin(){
+  $app.innerHTML = `
+  <form class="stack-lg" id="pinf" novalidate>
+    <div class="stack"><h1>Area docente</h1><p class="hint">Riservata all'insegnante. · Teacher only.</p></div>
+    <label class="f" for="pin">PIN<input type="password" id="pin" autocomplete="off"></label>
+    <p id="perr" class="hint hidden" style="color:var(--ko)">PIN errato. Riprova.</p>
+    <div class="row between"><button class="btn quiet" type="button" id="back">← Torna al test</button><button class="btn" type="submit">Entra</button></div>
+  </form>`;
+  const pin=document.getElementById("pin"); pin.focus();
+  document.getElementById("back").addEventListener("click",()=>{ reset(); render(); });
+  document.getElementById("pinf").addEventListener("submit",e=>{
+    e.preventDefault();
+    if(pin.value.trim()===TEACHER_PIN){ S.view="teacher"; render(); }
+    else { document.getElementById("perr").classList.remove("hidden"); pin.select(); }
+  });
+}
+document.getElementById("teacherLink").addEventListener("click",()=>{
+  if(S.view==="quiz"||S.view==="writing"){ return; }
+  clearInterval(timer); reset(); S.view="pin"; render(); window.scrollTo(0,0);
+});
+render();
+</script>
+</body>
+</html>
